@@ -101,7 +101,7 @@ def train_model(
                     L_pos.item(),
                     L_neg.item(),
                     L_prior.item() if L_prior else None,
-                    L_post_val,
+                    L_pos_val,
                 )
                 loss_components.append(batch_loss)
 
