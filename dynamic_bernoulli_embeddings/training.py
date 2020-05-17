@@ -1,5 +1,6 @@
 """Functions for building the training loop"""
 import numpy as np
+import pandas as pd
 import torch
 
 from .embeddings import DynamicBernoulliEmbeddingModel
