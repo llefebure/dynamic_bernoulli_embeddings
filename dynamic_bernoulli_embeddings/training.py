@@ -2,8 +2,8 @@
 import numpy as np
 import torch
 
-from .models.embeddings import DynamicBernoulliEmbeddingModel
-from .data.preprocessing import Data
+from .embeddings import DynamicBernoulliEmbeddingModel
+from .preprocessing import Data
 
 
 def train_model(
