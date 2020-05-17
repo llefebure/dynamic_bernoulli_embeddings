@@ -103,10 +103,10 @@ def train_model(
                     L_prior.item() if L_prior else None,
                     L_pos_val,
                 )
-                loss_components.append(batch_loss)
+                loss_history.append(batch_loss)
 
-    loss_components = pd.DataFrame(
-        batch_los, columns=["loss", "l_pos", "l_neg", "L_prior", "L_pos_val"]
+    loss_history = pd.DataFrame(
+        loss_history, columns=["loss", "l_pos", "l_neg", "L_prior", "L_pos_val"]
     )
 
-    return model, loss_components
+    return model, loss_history
