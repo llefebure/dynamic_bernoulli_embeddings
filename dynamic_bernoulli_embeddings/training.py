@@ -107,7 +107,7 @@ def train_model(
                 loss_history.append(batch_loss)
 
     loss_history = pd.DataFrame(
-        loss_history, columns=["loss", "l_pos", "l_neg", "L_prior", "L_pos_val"]
+        loss_history, columns=["loss", "l_pos", "l_neg", "l_prior", "l_pos_val"]
     )
 
     return model, loss_history
