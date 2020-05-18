@@ -51,7 +51,6 @@ class DynamicBernoulliEmbeddingModel(nn.Module):
         self.negative_samples = ns  # Number of negative samples.
         self.dictionary = dictionary
         self.dictionary_reverse = {v: k for k, v in dictionary.items()}
-        self.embeddings = None  # Will eventually be the trained embeddings for analysis
 
         # Embeddings parameters.
         self.rho = nn.Embedding(V * T, k)  # Stacked dynamic embeddings
@@ -135,28 +134,4 @@ class DynamicBernoulliEmbeddingModel(nn.Module):
         embeddings = self.rho.cpu().weight.data.reshape(
             (self.T, len(self.dictionary), self.k)
         )
-        self.embeddings = embeddings
-        return self.embeddings
-
-    def neighborhood(self, v, t, n=20):
-        """Finds the neighborhood of terms around `v` in timestep `t`"""
-        if self.embeddings is None:
-            self.get_embeddings()
-        idx = self.dictionary[v]
-        rho_v = self.embeddings[t][idx].reshape((1, -1))
-        rho = self.embeddings[t].T
-        sim = np.dot(np.sign(rho_v), rho).flatten()
-        sim /= np.sqrt((rho_v ** 2).sum())
-        sim /= np.sqrt((rho ** 2).sum(axis=0).flatten())
-        return [self.dictionary_reverse[i] for i in np.argsort(sim)[::-1][:n]]
-
-    def absolute_drift(self, n=50):
-        """Find the top drifting terms"""
-        if self.embeddings is None:
-            self.get_embeddings()
-        change = np.sqrt(
-            ((self.embeddings[-1] - self.embeddings[0]) ** 2).sum(axis=1)
-        ).flatten()
-        return sorted(
-            list(zip(change, self.dictionary_reverse.values())), reverse=True
-        )[:n]
+        return embeddings
