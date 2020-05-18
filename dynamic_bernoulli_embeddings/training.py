@@ -16,6 +16,7 @@ def train_model(
     num_epochs=10,
     lr=2e-3,
     validate_after=100,
+    **kwargs
 ):
     """"Trains the model
 
@@ -54,7 +55,7 @@ def train_model(
 
     # Build model.
     model = DynamicBernoulliEmbeddingModel(
-        len(data.dictionary), data.T, m, dictionary, data.unigram_logits
+        len(data.dictionary), data.T, m, dictionary, data.unigram_logits, **kwargs
     )
     model = model.to(device)
 
