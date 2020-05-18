@@ -133,5 +133,5 @@ class DynamicBernoulliEmbeddingModel(nn.Module):
         """Gets trained embeddings and reshapes them into (T, V, k)"""
         embeddings = self.rho.cpu().weight.data.reshape(
             (self.T, len(self.dictionary), self.k)
-        )
+        ).numpy()
         return embeddings
