@@ -92,7 +92,7 @@ def train_model(
                     _, L_pos_val_batch, _, _ = model(
                         val_targets, val_times, val_contexts, validate=True
                     )
-                    L_pos_val += L_pos_val_batch
+                    L_pos_val += L_pos_val_batch.item()
                 L_pos_val /= len(data_val)
 
             # Collect loss history. Ignore the initialization epoch 0.
