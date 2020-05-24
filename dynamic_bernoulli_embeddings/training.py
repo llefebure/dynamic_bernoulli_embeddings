@@ -32,6 +32,16 @@ def train_model(
     notebook : bool
         Indicates whether the function is being run in a notebook to allow for nicer
         progress bars.
+    m : int
+        The number of mini batches to use.
+    num_epochs : int
+        Number of epochs to train for, excluding the first initialization epoch.
+    lr : float
+        Learning rate.
+    validate_after : int
+        Compute the validation metric after this many minibatches.
+    **kwargs
+        Forwarded to init of `DynamicBernoulliEmbeddingModel`.
     """
 
     # Use nicer tqdm progress bar if in a notebook.
@@ -84,7 +94,7 @@ def train_model(
 
             # Validation.
             L_pos_val = None
-            if validation is not None and j > 0 and j % validate_after == 0:
+            if validation is not None and i > 0 and j % validate_after == 0:
                 L_pos_val = 0
                 model.eval()
                 for val_targets, val_contexts, val_times in data_val.epoch(10):
@@ -92,7 +102,6 @@ def train_model(
                         val_targets, val_times, val_contexts, validate=True
                     )
                     L_pos_val += L_pos_val_batch.item()
-                L_pos_val /= len(data_val)
 
             # Collect loss history. Ignore the initialization epoch 0.
             if i > 0:
