@@ -47,9 +47,7 @@ def train_model(
     validation_mask = np.repeat(False, dataset.shape[0])
     if validation is not None:
         assert 0 < validation < 1
-        validation_mask = np.random.choice(
-            [True, False], size=dataset.shape[0], p=[validation, 1 - validation]
-        )
+        validation_mask = np.random.random(dataset.shape[0]) < validation
     data = Data(dataset[~validation_mask], dictionary, device)
     data_val = Data(dataset[validation_mask], dictionary, device)
 
