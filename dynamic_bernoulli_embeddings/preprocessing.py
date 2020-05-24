@@ -47,6 +47,7 @@ class Data:
         self.dictionary = dictionary
         self.N = df.shape[0]
         self.device = device
+        self.ctx = None
 
         # Generate bow with token indices and remove all unknown words.
         bow_filtered = df[bow_col].apply(
@@ -78,9 +79,6 @@ class Data:
 
     def _context_mask(self, N):
         """Generates a mask to be used for fetching context vectors
-        
-        TODO: This is called repeatedly and is doing a lot of unnecessary work. Would be
-        better to just generate once with the max `N` and index in as necessary.
 
         Parameters
         ----------
@@ -99,11 +97,13 @@ class Data:
             matrix will be [True, True, False, False] because the first word in the text
             has no pre-context.
         """
-        ctx = (
-            np.tile(np.arange(N), (self.cs * 2, 1)).T
-            + np.delete(np.arange(2 * self.cs + 1), self.cs)
-            - self.cs
-        )
+        if self.ctx is None or self.ctx.shape[0] < N:
+            self.ctx = (
+                np.tile(np.arange(N), (self.cs * 2, 1)).T
+                + np.delete(np.arange(2 * self.cs + 1), self.cs)
+                - self.cs
+            )
+        ctx = self.ctx[:N]
         oob = (ctx > N) | (ctx < 0)
         return ctx, oob
 
