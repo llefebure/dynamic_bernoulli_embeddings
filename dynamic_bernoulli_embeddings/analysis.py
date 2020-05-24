@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class Embedding:
     """A class for performing analysis on the trained embeddings"""
 
@@ -23,6 +24,14 @@ class Embedding:
         change = np.sqrt(
             ((self.embeddings[-1] - self.embeddings[0]) ** 2).sum(axis=1)
         ).flatten()
-        return sorted(
-            list(zip(change, self.id_to_token.values())), reverse=True
-        )[:n]
+        return sorted(list(zip(change, self.id_to_token.values())), reverse=True)[:n]
+
+    def change_points(self, n=50):
+        """Find the most variable terms"""
+        change = np.sqrt(
+            ((self.embeddings[1:] - self.embeddings[:-1]) ** 2).sum(axis=-1)
+        )
+        ordered = np.argsort(change, axis=None)[::-1]
+        times = ordered // change.shape[1]
+        terms = ordered // change.shape[0]
+        return list(zip(times, [self.id_to_token[t] for t in terms]))[:n]
