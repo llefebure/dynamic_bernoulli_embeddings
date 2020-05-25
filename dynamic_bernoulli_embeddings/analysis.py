@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class Embedding:
+class DynamicEmbeddingAnalysis:
     """A class for performing analysis on the trained embeddings"""
 
     def __init__(self, embeddings, dictionary):
@@ -39,5 +39,5 @@ class Embedding:
         )
         ordered = np.argsort(change, axis=None)[::-1]
         times = ordered // change.shape[1]
-        terms = ordered % change.shape[0]
+        terms = ordered % change.shape[1]
         return list(zip(times, [self.id_to_token[t] for t in terms]))[:n]

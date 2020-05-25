@@ -26,7 +26,8 @@ class DynamicBernoulliEmbeddingModel(nn.Module):
         T : int
             Number of timesteps.
         m_t : dict
-            The total number of tokens in each timestep to compute the scaling factor for the pseudo log likelihoods.
+            The total number of tokens in each timestep to compute the scaling factor
+            for the pseudo log likelihoods.
         dictionary : dict
             Maps word to index.
         sampling_distribution : tensor (V,)
