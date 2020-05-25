@@ -10,7 +10,7 @@ class DynamicBernoulliEmbeddingModel(nn.Module):
         self,
         V,
         T,
-        m,
+        m_t,
         dictionary,
         sampling_distribution,
         k=50,
@@ -25,8 +25,8 @@ class DynamicBernoulliEmbeddingModel(nn.Module):
             Vocabulary size.
         T : int
             Number of timesteps.
-        m : int
-            The scaling factor to apply to the pseudo likelihood values.
+        m_t : dict
+            The total number of tokens in each timestep to compute the scaling factor for the pseudo log likelihoods.
         dictionary : dict
             Maps word to index.
         sampling_distribution : tensor (V,)
@@ -44,7 +44,7 @@ class DynamicBernoulliEmbeddingModel(nn.Module):
         self.V = V  # Vocab size.
         self.T = T  # Number of timestepss.
         self.k = k  # Embedding dimension.
-        self.m = m  # Scaling factor for pseudo LL
+        self.total_tokens = sum(m_t.values())  # Used for scaling factor for pseudo LL
         self.lambda_ = lambda_  # Scaling factor on the time drift prior.
         self.lambda_0 = lambda_0  # Scaling factor on the embedding priors.
         self.sampling_distribution = Categorical(logits=sampling_distribution)
@@ -116,7 +116,7 @@ class DynamicBernoulliEmbeddingModel(nn.Module):
         L_pos = self.L_pos(eta)
         if not validate:
             L_neg = self.L_neg(batch_size, times, contexts_summed)
-            loss = self.m * (L_pos + L_neg)
+            loss = (self.total_tokens / batch_size) * (L_pos + L_neg)
             L_prior = -self.lambda_0 / 2 * (self.alpha.weight ** 2).sum()
             L_prior += -self.lambda_0 / 2 * (self.rho.weight[0] ** 2).sum()
             if dynamic:
@@ -131,7 +131,9 @@ class DynamicBernoulliEmbeddingModel(nn.Module):
 
     def get_embeddings(self):
         """Gets trained embeddings and reshapes them into (T, V, k)"""
-        embeddings = self.rho.cpu().weight.data.reshape(
-            (self.T, len(self.dictionary), self.k)
-        ).numpy()
+        embeddings = (
+            self.rho.cpu()
+            .weight.data.reshape((self.T, len(self.dictionary), self.k))
+            .numpy()
+        )
         return embeddings

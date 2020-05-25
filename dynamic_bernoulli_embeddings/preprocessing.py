@@ -52,7 +52,8 @@ class Data:
         # Generate bow with token indices and remove all unknown words.
         bow_filtered = df[bow_col].apply(
             lambda x: list(
-                filter(lambda x: x is not None, [dictionary.get(w, None) for w in x]))
+                filter(lambda x: x is not None, [dictionary.get(w, None) for w in x])
+            )
         )
         tfs = Counter(word for row in bow_filtered for word in row)
 
