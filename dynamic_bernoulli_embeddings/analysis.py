@@ -41,6 +41,7 @@ class DynamicEmbeddingAnalysis:
             ((self.embeddings[1:] - self.embeddings[:-1]) ** 2).sum(axis=-1)
         )
         ordered = np.argsort(change, axis=None)[::-1]
-        times = ordered // change.shape[1]
+        # Plus one for times since change is shifted back one
+        times = ordered // change.shape[1] + 1
         terms = ordered % change.shape[1]
         return list(zip(times, [self.id_to_token[t] for t in terms]))[:n]
