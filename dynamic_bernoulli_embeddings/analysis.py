@@ -9,15 +9,21 @@ class Embedding:
         self.token_to_id = dictionary
         self.id_to_token = {v: k for k, v in dictionary.items()}
 
-    def neighborhood(self, v, t, n=20):
+    def neighborhood(self, v, t, n=20, sign=False):
         """Finds the neighborhood of terms around `v` in timestep `t`"""
         idx = self.token_to_id[v]
         rho_v = self.embeddings[t][idx].reshape((1, -1))
         rho = self.embeddings[t].T
-        sim = np.dot(np.sign(rho_v), rho).flatten()
+        if sign:
+            rho_v_adj = np.sign(rho_v)
+        else:
+            rho_v_adj = rho_v
+        sim = np.dot(rho_v_adj, rho).flatten()
         sim /= np.sqrt((rho_v ** 2).sum())
         sim /= np.sqrt((rho ** 2).sum(axis=0).flatten())
-        return [self.id_to_token[i] for i in np.argsort(sim)[::-1][:n]]
+        ordered_sim = np.argsort(sim)[::-1]
+        ordered_sim = np.delete(ordered_sim, np.where(ordered_sim == idx))
+        return [self.id_to_token[i] for i in ordered_sim[:n]]
 
     def absolute_drift(self, n=50):
         """Find the top drifting terms"""
@@ -33,5 +39,5 @@ class Embedding:
         )
         ordered = np.argsort(change, axis=None)[::-1]
         times = ordered // change.shape[1]
-        terms = ordered // change.shape[0]
+        terms = ordered % change.shape[0]
         return list(zip(times, [self.id_to_token[t] for t in terms]))[:n]
