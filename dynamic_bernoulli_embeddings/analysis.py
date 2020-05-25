@@ -9,7 +9,7 @@ class DynamicEmbeddingAnalysis:
         self.token_to_id = dictionary
         self.id_to_token = {v: k for k, v in dictionary.items()}
 
-    def neighborhood(self, v, t, n=20, sign=False):
+    def neighborhood(self, v, t, n=20, sign=False, index=False):
         """Finds the neighborhood of terms around `v` in timestep `t`"""
         idx = self.token_to_id[v]
         rho_v = self.embeddings[t][idx].reshape((1, -1))
@@ -23,7 +23,10 @@ class DynamicEmbeddingAnalysis:
         sim /= np.sqrt((rho ** 2).sum(axis=0).flatten())
         ordered_sim = np.argsort(sim)[::-1]
         ordered_sim = np.delete(ordered_sim, np.where(ordered_sim == idx))
-        return [self.id_to_token[i] for i in ordered_sim[:n]]
+        if index:
+            return ordered_sim[:n]
+        else:
+            return [self.id_to_token[i] for i in ordered_sim[:n]]
 
     def absolute_drift(self, n=50):
         """Find the top drifting terms"""
